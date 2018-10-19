@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__.'/../bootstrap/helpers.php';  #与教程不同,后续查找原因
+
 return [
 
     /*
@@ -65,7 +67,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Shanghai',
 
     /*
     |--------------------------------------------------------------------------
