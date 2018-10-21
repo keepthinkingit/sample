@@ -8422,6 +8422,32 @@ p {
   color: #fff;
 }
 
+/* Users lists */
+
+.users {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+}
+
+.users li {
+  overflow: auto;
+  padding: 10px 0;
+  border-bottom: 1px solid #eeeeee;
+}
+
+/* Users edit */
+
+.gravatar_edit {
+  margin: 15px auto;
+  text-align: center;
+}
+
+.gravatar_edit .gravatar {
+  float: none;
+  max-width: 100px;
+}
+
 /* sidebar */
 
 aside section {
@@ -8522,5 +8548,13 @@ footer img.brand-icon {
 footer .slogon {
   font-size: 13px;
   font-weight: bold;
+}
+
+/* button */
+
+.delete-btn {
+  float: right;
+  position: relative;
+  right: 0;
 }
 

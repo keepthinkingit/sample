@@ -67,6 +67,30 @@ p {
     }
 }
 
+/* Users lists */
+
+.users {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+    li {
+        overflow: auto;
+        padding: 10px 0;
+        border-bottom: 1px solid $gray-lighter;
+    }
+}
+
+/* Users edit */
+
+.gravatar_edit {
+    margin: 15px auto;
+    text-align: center;
+    .gravatar {
+        float: none;
+        max-width: 100px;
+    }
+}
+
 /* sidebar */
 
 aside {
@@ -163,5 +187,13 @@ footer {
         font-weight: bold;
     }
 
+}
+
+/* button */
+
+.delete-btn {
+    float: right;
+    position: relative;
+    right: 0;
 }
 
