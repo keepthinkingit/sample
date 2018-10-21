@@ -34,7 +34,7 @@ class UsersController extends Controller
 
     public function lists()
     {
-        $users = User::paginate(2);
+        $users = User::paginate(10);
         return view('users.lists', compact('users'));
     }
 
