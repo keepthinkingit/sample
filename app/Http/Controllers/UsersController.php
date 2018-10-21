@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Models\User;
 use Auth;
+use Mail;
 
 class UsersController extends Controller
 {
@@ -13,7 +14,7 @@ class UsersController extends Controller
     {
         //通过 except 方法来设定 指定动作  不  使用 Auth 中间件进行过滤
         $this->middleware('auth', [
-            'except' => ['show', 'create', 'store', 'lists']
+            'except' => ['show', 'create', 'store', 'lists', 'confirmEmail']
     ]);
         //只有未登录用户才能访问create控制器
         $this->middleware('guest', [
@@ -44,17 +45,45 @@ class UsersController extends Controller
             'email' => 'required|email|unique:users|max:255',
             'password' => 'required|confirmed|min:6'
         ]);
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
 
-        Auth::login($user);
-        session()->flash('success', 'welcome to the new world~');
-        return redirect()->route('users.show', [$user]);
+        $this->sendEmailConfirmationTo($user);
+        session()->flash('success', '验证邮件已发送到你的注册邮箱上，请注意查收。');
+        return redirect('/');
     }
 
+    public function sendEmailConfirmationTo($user)
+    {
+        $view = 'emails.confirm';
+        $data = compact('user');
+        $from = 'admin@mydomain.com';
+        $name = 'admin';
+        $to = $user->email;
+        $subject = '感谢注册 Sample 应用！请确认你的邮箱。';
+
+        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject)
+        {
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
+    }
+
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token', $token)->firstOrFail();
+
+        $user->activated = true;
+        $user->activation_token = null;
+        $user->save();
+
+        Auth::login($user);
+        session()->flash('success', 'Congratulations!You are our members!');
+        return redirect()->route('users.show', [$user]);
+    }
     public function edit(User $user)
     {
         $this->authorize('update', $user); //authorize 方法接收两个参数，第一个为授权策略的名称，第二个为进行授权验证的数据
