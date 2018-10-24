@@ -86,6 +86,7 @@ class UsersController extends Controller
         session()->flash('success', 'Congratulations!You are our members!');
         return redirect()->route('users.show', [$user]);
     }
+
     public function edit(User $user)
     {
         $this->authorize('update', $user); //authorize 方法接收两个参数，第一个为授权策略的名称，第二个为进行授权验证的数据
@@ -118,4 +119,20 @@ class UsersController extends Controller
         session()->flash('success', '成功删除用户');
         return back();
     }
+
+    //获取粉丝
+    public function followers(User $user){
+        $users = $user->followers()->paginate(21);
+        $title = '粉丝';
+        return view('users.show_follow', compact('users', 'title'));
+    }
+
+    //获取关注列表
+    public function followings(User $user){
+        $users = $user->followings()->paginate(21);
+        $title = '关注的人';
+        return view('users.show_follow', compact('users', 'title'));
+    }
+
+
 }

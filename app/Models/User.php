@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\ResetPassword;
+use Auth;
 
 class User extends Authenticatable
 {
@@ -56,11 +57,58 @@ class User extends Authenticatable
 
     /*
      * 将当前用户发布过的所有微博从数据库中取出，并根据创建时间来倒序排序。
-     * TODO:获取当前用户关注的人发布过的所有微博动态
+     * 获取当前用户关注的人发布过的所有微博动态
      */
     public function feed()
     {
-        return $this->statuses()
-                    ->orderBy('created_at', 'desc');
+        $user_ids = Auth::user()->followings->pluck('id')->toArray();
+        array_push($user_ids, Auth::user()->id);
+        return Status::whereIn('user_id', $user_ids)
+                     ->with('user')
+                     ->orderBy('created_at', 'desc');
+    }
+
+    /*
+     * 粉丝关系列表
+     */
+    public function followers()
+    {
+        //belongsToMany 参数:关联模型全称,中间表名,中间表中当前model对应的关联字段,中间表中目标model对应的关联字段
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+    }
+
+    /*
+     *用户关注人列表
+     *  关注人列表，关联表，当前model在中间表中的字段，目标model在中间表中的字段
+     */
+    public function followings()
+    {
+        return $this->belongsToMany(User::Class, 'followers', 'follower_id', 'user_id');
+    }
+
+    //关注
+    public function follow($user_ids)
+    {
+        if(!is_array($user_ids)){
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->sync($user_ids);
+    }
+
+    //取消关注
+    public function unfollow($user_ids)
+    {
+        if (!is_array($user_ids)){
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->detach($user_ids);
+    }
+
+    /*
+     * 判断是否含有user_id,即:是否已经在关注列表
+     */
+    public function isFollowing($user_id)
+    {
+        return $this->followings->contains($user_id);
     }
 }
